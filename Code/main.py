@@ -109,6 +109,9 @@ class Game:
                 # extra collision
                 if pygame.sprite.spritecollide(laser, self.extra, True):
                     laser.kill()
+
+                
+
         # alien lasers
         if self.alien_laser:
             for laser in self.alien_laser:
@@ -133,7 +136,7 @@ class Game:
                 if pygame.sprite.spritecollide(alien, self.player, False):
                     pygame.quit()
 
-                    self.game_over = True  #Game over
+                    #self.game_over = True  #Game over
 
                     sys.exit()
                     
@@ -179,11 +182,7 @@ class Game:
             screen.blit(game_over_text, (screen_width // 2 - 120, screen_height // 2))
             pygame.display.flip()
             return  # Detener la actualización si el juego ha terminado
-
-        self.player.update()
-    
-        if not self.game_over:  # Solo actualizamos el movimiento de los aliens si el juego no ha terminado
-            self.aliens.update(self.alien_direction)
+        
 
         pygame.display.flip()
         clock.tick(60)
