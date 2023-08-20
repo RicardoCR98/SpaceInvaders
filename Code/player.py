@@ -14,6 +14,11 @@ class Player(pygame.sprite.Sprite):
         self.laser_cooldown = 1000
         self.lasers = pygame.sprite.Group()
 
+        
+
+        #puntuacion
+        self.score = 0
+
     def get_input(self):
         keys = pygame.key.get_pressed()
 
@@ -43,6 +48,7 @@ class Player(pygame.sprite.Sprite):
         self.lasers.add(Laser(self.rect.center,-8,self.rect.bottom))
 
     def update(self):
+
         self.get_input()
         self.constraint()
         self.recharge()

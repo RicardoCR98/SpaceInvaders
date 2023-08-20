@@ -8,6 +8,17 @@ class Alien(pygame.sprite.Sprite):
         self.image = pygame.image.load(file_path).convert_alpha()
         self.rect = self.image.get_rect(topleft=(x, y))
 
+
+        #Puntuacion de Aliens
+        if enemies == 'yellow':
+            self.score_value = 15  # Puntuación para alienígenas amarillos
+        elif enemies == 'green':
+            self.score_value = 10  # Puntuación para alienígenas verdes
+        elif enemies == 'red':
+            self.score_value = 5  # Puntuación para alienígenas rojos
+        elif enemies == 'extra':
+            self.score_value = 20  # Puntuación para otros alienígenas
+
     def update(self, direction):
         self.rect.x += direction
 
