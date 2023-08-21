@@ -9,12 +9,12 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.image.get_rect(midbottom=pos)
         self.speed = speed
         self.max_x_constraint = constraint
+        #Variables para el disparo
         self.ready = True
         self.laser_time = 0
         self.laser_cooldown = 1000
         self.lasers = pygame.sprite.Group()
 
-        
 
         #puntuacion
         self.score = 0
@@ -27,12 +27,16 @@ class Player(pygame.sprite.Sprite):
         elif keys[pygame.K_LEFT]:
             self.rect.x -= self.speed
 
+        #Implementar mecánica de disparo
         if keys[pygame.K_SPACE] and self.ready:
             self.shoot_laser()
             self.ready = False
             self.laser_time = pygame.time.get_ticks()
 
     def recharge(self):
+        """Función de recarga, se vizualiza la resta entre el tiempo actual y el tiempo desde que se
+        disparó el ultimo proyectil, si ese tiempo es mayor al cooldawn entonces el boleano se cambia
+        a verdadero para volver a tener la posibilidad de dispara."""
         if not self.ready:
             current_time = pygame.time.get_ticks()
             if current_time - self.laser_time > self.laser_cooldown:
@@ -44,6 +48,7 @@ class Player(pygame.sprite.Sprite):
         if self.rect.right >= self.max_x_constraint:
             self.rect.right = self.max_x_constraint
 
+    # Añadir mecánica de disparo
     def shoot_laser(self):
         self.lasers.add(Laser(self.rect.center,-8,self.rect.bottom))
 
