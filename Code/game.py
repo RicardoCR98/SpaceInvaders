@@ -3,7 +3,7 @@ import sys
 from player import Player
 import obstacle
 from alien import Alien, Extra
-from random import choice, randint
+from random import choice, randint, random
 from laser import Laser
 
 class Game:
@@ -22,6 +22,9 @@ class Game:
         self.block_size = 6
         self.blocks = pygame.sprite.Group()
         self.obstacle_amount = 4
+        """"" Se crea un arreglo el cual posee el offset para la creación de cada obstaculo en base al número de obstáculos
+        de la variable obstacle_amount, así pues se multiplicará cada uno de los números en el rango de
+        obstacle_amount por el largo de la pantalla dividido para los obstaculos totales a generar"""""
         self.obstacle_x_position = [num * (screen_width / self.obstacle_amount) for num in range(self.obstacle_amount)]
         self.create_multiple_obstacles(*self.obstacle_x_position, x_start=screen_width / 15, y_start=480)
 
@@ -39,6 +42,7 @@ class Game:
         self.lives = 3
         self.game_over = False
 
+    # Lógica de obstáculos
     def create_obstacle(self, x_start, y_start, offset_x):
         # En base a u sistema de matrices se añadira bloques para formar un obstaculo.
         for row_index, row in enumerate(self.shape):
@@ -62,8 +66,8 @@ class Game:
         self.create_multiple_obstacles(*self.obstacle_x_position, x_start=self.screen_width / 15, y_start=480)
 
 
-
-    def alien_setup(self, rows, cols, x_distance=60, y_distance=48, x_offset=70, y_offset=100):
+    # Lógica de enemigos aliens
+    def alien_setup(self, rows, cols, x_distance=60, y_distance=48, x_offset=70, y_offset=90):
         for row_index, row in enumerate(range(rows)):
             for col_index, col in enumerate(range(cols)):
                 x = col_index * x_distance + x_offset
@@ -93,9 +97,24 @@ class Game:
 
     def alien_shoot(self):
         if self.aliens.sprites():
-            random_alien = choice(self.aliens.sprites())
-            laser_sprite = Laser(random_alien.rect.center, 6, self.screen_height)
+            # Elegir aleatoriamente un enemigo con probabilidad adicional para las filas superiores
+            upper_row_prob = 0.8  # Probabilidad de que tome valores de arriba de la mitad de la pantalla
+            random_alien = None
+
+            if random() < upper_row_prob:
+                # Elegir un enemigo de las filas superiores con más probabilidad (enemigos con posición por encima de la mitad de la pantalla)
+                upper_row_aliens = [alien for alien in self.aliens.sprites() if alien.rect.y < self.screen_height / 2]
+                if upper_row_aliens:
+                    random_alien = choice(upper_row_aliens)
+
+            if random_alien is None:
+                # Si no hay enemigos en las filas superiores o no se cumple la probabilidad,
+                # elegir un enemigo al azar de todos los enemigos
+                random_alien = choice(self.aliens.sprites())
+
+            laser_sprite = Laser(random_alien.rect.center, 4, self.screen_height)
             self.alien_laser.add(laser_sprite)
+        
 
     def extra_alien_timer(self):
         self.extra_spawn_time -= 1
@@ -110,6 +129,7 @@ class Game:
 
         self.regenerate_obstacles()
 
+    # Lógica de colisiones
     def collision_checks(self):
         # player lasers
         if self.player.sprite.lasers:

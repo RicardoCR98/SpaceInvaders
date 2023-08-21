@@ -50,7 +50,7 @@ class Player(pygame.sprite.Sprite):
 
     # Añadir mecánica de disparo
     def shoot_laser(self):
-        self.lasers.add(Laser(self.rect.center,-8,self.rect.bottom))
+        self.lasers.add(Laser(self.rect.center,-6,self.rect.bottom))
 
     def update(self):
 
