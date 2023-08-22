@@ -33,6 +33,7 @@ class Game:
         self.alien_setup(rows=5, cols=8)
         self.alien_laser = pygame.sprite.Group()
         self.alien_direction = 1
+        self.alien_killed = 0
 
         # Extra setup
         self.extra = pygame.sprite.GroupSingle()
@@ -84,10 +85,10 @@ class Game:
         all_aliens = self.aliens.sprites()
         for alien in all_aliens:
             if alien.rect.right >= self.screen_width:
-                self.alien_direction = -1
+                self.alien_direction = -1 - self.alien_killed
                 self.alien_move_down(2)
             elif alien.rect.left <= 0:
-                self.alien_direction = 1
+                self.alien_direction = 1  + self.alien_killed
                 self.alien_move_down(2)
 
     def alien_move_down(self, distance):
@@ -146,6 +147,7 @@ class Game:
                 for alien in aliens_hit:
                     laser.kill()
                     self.player.sprite.score += alien.score_value
+                    self.alien_killed += 0.06 #tasa de incremento de velocidad cuando un alien es eliminado
 
                 # extra collision
                 if pygame.sprite.spritecollide(laser, self.extra, True):
