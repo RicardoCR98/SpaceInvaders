@@ -42,6 +42,10 @@ class Game:
         # Player
         self.lives = 3
         self.game_over = False
+        
+        # pause game
+        self.paused = False
+        self.font = pygame.font.Font(None, 36)
 
     # Lógica de obstáculos
     def create_obstacle(self, x_start, y_start, offset_x):
