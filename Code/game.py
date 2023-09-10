@@ -1,5 +1,6 @@
 import pygame
 import sys
+from scoreManager import ScoreManager
 from player import Player
 import obstacle
 from alien import Alien, Extra
@@ -13,6 +14,7 @@ class Game:
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
+        score_manager = ScoreManager
 
         # configuration de la nave
         player_sprite = Player((screen_width / 2, screen_height), screen_width, 5)
@@ -36,7 +38,7 @@ class Game:
         self.alien_direction = 1
         self.alien_killed = 0
         self.in_main_menu = False
-        self.main_menu = MainMenu(screen_width,screen_height)
+        self.main_menu = MainMenu(screen_width,screen_height, score_manager)
 
         # Extra setup
         self.extra = pygame.sprite.GroupSingle()
@@ -49,6 +51,10 @@ class Game:
         # pause game
         self.paused = False
         self.font = pygame.font.Font(None, 36)
+
+        # Administrador de puntajes
+        self.score_manager = ScoreManager('scores.txt')
+        self.score_manager.load_scores()
 
         #Audio
         music = pygame.mixer.Sound('Audio/music.wav')
@@ -192,11 +198,11 @@ class Game:
                 pygame.sprite.spritecollide(alien, self.blocks, True)
 
                 if pygame.sprite.spritecollide(alien, self.player, False):
-                    pygame.quit()
+                    #pygame.quit()
 
-                    # self.game_over = True  #Game over
+                    self.game_over = True  #Game over
 
-                    sys.exit()
+                    #sys.exit()
 
     def return_to_main_menu(self):
         self.main_menu.draw(self.screen)
@@ -246,6 +252,12 @@ class Game:
             font = pygame.font.Font(None, 80)
             game_over_text = font.render("Game Over", True, (255, 0, 0))
             self.screen.blit(game_over_text, (self.screen_width // 2 - 120, self.screen_height // 2))
+            pygame.display.flip()
 
-        pygame.display.flip()
+            # Guardar el puntaje actual
+            self.score_manager.add_score(self.player.sprite.score)
+            self.score_manager.save_scores()
+
+            return  # Detener la actualización si el juego ha terminado
+        
         # clock.tick(60)

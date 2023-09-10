@@ -2,6 +2,7 @@ import pygame
 import sys
 from game import Game
 from menu import MainMenu
+from scoreManager import ScoreManager
 
 if __name__ == '__main__':
     pygame.init()
@@ -10,7 +11,14 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
     game = Game(screen, screen_width, screen_height)
-    main_menu = MainMenu(screen_width, screen_height)
+    #main_menu = MainMenu(screen_width, screen_height)
+
+    #C
+    score_manager = ScoreManager('scores.txt')
+    score_manager.load_scores()
+    
+    main_menu = MainMenu(screen_width, screen_height, score_manager)
+    #CF
 
     ALIENLASER = pygame.USEREVENT + 1
     pygame.time.set_timer(ALIENLASER, 800)
@@ -47,6 +55,17 @@ if __name__ == '__main__':
                                             screen_height // 2 - pause_message.get_height() // 2))
             else:
                 game.run()
+                #C
+                if game.game_over:
+                    new_score = game.player.sprite.score  # Obtén el puntaje del jugador cuando el juego termine
+                    score_manager.add_score(new_score)  # Agrega el puntaje a la lista de puntajes
+                    score_manager.save_scores()  # Guarda los puntajes actualizados
+                    # Obtener los nuevos puntajes máximos después de agregar el nuevo puntaje.
+                    top_scores = score_manager.get_top_scores()
+                    print("Updated Top Scores:", top_scores)
+                #CF
 
         pygame.display.flip()
         clock.tick(60)
+        
+    game.score_manager.save_scores()
