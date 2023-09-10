@@ -5,6 +5,7 @@ import obstacle
 from alien import Alien, Extra
 from random import choice, randint, random
 from laser import Laser
+from menu import MainMenu
 
 class Game:
 
@@ -34,6 +35,8 @@ class Game:
         self.alien_laser = pygame.sprite.Group()
         self.alien_direction = 1
         self.alien_killed = 0
+        self.in_main_menu = False
+        self.main_menu = MainMenu(screen_width,screen_height)
 
         # Extra setup
         self.extra = pygame.sprite.GroupSingle()
@@ -42,11 +45,21 @@ class Game:
         # Player
         self.lives = 3
         self.game_over = False
-        
+
         # pause game
         self.paused = False
         self.font = pygame.font.Font(None, 36)
 
+        #Audio
+        music = pygame.mixer.Sound('Audio/music.wav')
+        music.set_volume(0.1)
+        music.play(loops=-1)
+        self.explosion_sound = pygame.mixer.Sound('Audio/explosion.wav')
+        self.explosion_sound.set_volume(0.3)
+        self.game_over_sound = pygame.mixer.Sound('Audio/gameOver.mp3')
+        self.game_over_sound.set_volume(0.5)
+        self.alien_laser_sound = pygame.mixer.Sound('Audio/laserAlien.wav')
+        self.alien_laser_sound.set_volume(0.3)
     # Lógica de obstáculos
     def create_obstacle(self, x_start, y_start, offset_x):
         # En base a u sistema de matrices se añadira bloques para formar un obstaculo.
@@ -70,7 +83,6 @@ class Game:
         self.blocks.empty()
         self.create_multiple_obstacles(*self.obstacle_x_position, x_start=self.screen_width / 15, y_start=480)
 
-
     # Lógica de enemigos aliens
     def alien_setup(self, rows, cols, x_distance=60, y_distance=48, x_offset=70, y_offset=90):
         for row_index, row in enumerate(range(rows)):
@@ -92,7 +104,7 @@ class Game:
                 self.alien_direction = -1 - self.alien_killed
                 self.alien_move_down(2)
             elif alien.rect.left <= 0:
-                self.alien_direction = 1  + self.alien_killed
+                self.alien_direction = 1 + self.alien_killed
                 self.alien_move_down(2)
 
     def alien_move_down(self, distance):
@@ -119,7 +131,7 @@ class Game:
 
             laser_sprite = Laser(random_alien.rect.center, 4, self.screen_height)
             self.alien_laser.add(laser_sprite)
-        
+            self.alien_laser_sound.play()
 
     def extra_alien_timer(self):
         self.extra_spawn_time -= 1
@@ -151,8 +163,8 @@ class Game:
                 for alien in aliens_hit:
                     laser.kill()
                     self.player.sprite.score += alien.score_value
-                    self.alien_killed += 0.06 #tasa de incremento de velocidad cuando un alien es eliminado
-
+                    self.alien_killed += 0.03  # tasa de incremento de velocidad cuando un alien es eliminado
+                    self.explosion_sound.play()
                 # extra collision
                 if pygame.sprite.spritecollide(laser, self.extra, True):
                     laser.kill()
@@ -166,10 +178,11 @@ class Game:
 
                 if pygame.sprite.spritecollide(laser, self.player, False):
                     laser.kill()
-                    print('EL JUGADOR A MUERTO')
                     # vidas del jugador
                     self.lives -= 1
                     if self.lives <= 0:
+                        print('EL JUGADOR A MUERTO')
+                        self.game_over_sound.play()
                         self.lives = 0
                         self.game_over = True
 
@@ -185,6 +198,15 @@ class Game:
 
                     sys.exit()
 
+    def return_to_main_menu(self):
+        self.main_menu.draw(self.screen)
+        for event in pygame.event.get():
+            action = self.main_menu.handle_event(event)
+            if action == "start_game":
+                self.in_main_menu = False
+            elif action == "quit":
+                pygame.quit()
+                sys.exit()
 
     def run(self):
         self.player.update()
@@ -212,20 +234,18 @@ class Game:
         # vidas
         font = pygame.font.Font(None, 30)
         lives_text = font.render(f'Lives: {self.lives}', True, (255, 255, 255))
-        self.screen.blit(lives_text, (10, 20))  # Ajusta la posición según tu preferencia
+        self.screen.blit(lives_text, (10, 20))  # Ajusta la posición según la preferencia
 
         # puntuacion
-        font = pygame.font.Font(None, 30) # Se puede borrar esta línea
+        font = pygame.font.Font(None, 30)  # Se puede borrar esta línea
         score_text = font.render(f'Score: {self.player.sprite.score}', True, (255, 255, 255))
-        self.screen.blit(score_text, (110, 20))  # Ajusta la posición según tu preferencia
+        self.screen.blit(score_text, (110, 20))  # Ajusta la posición según la preferencia
 
         # Game over
         if self.game_over:
-            font = pygame.font.Font(None, 60)
+            font = pygame.font.Font(None, 80)
             game_over_text = font.render("Game Over", True, (255, 0, 0))
             self.screen.blit(game_over_text, (self.screen_width // 2 - 120, self.screen_height // 2))
-            pygame.display.flip()
-            return  # Detener la actualización si el juego ha terminado
 
-        #pygame.display.flip()
-        #clock.tick(60)
+        pygame.display.flip()
+        # clock.tick(60)

@@ -1,9 +1,7 @@
 import pygame
-import  sys
+import sys
 from game import Game
 from menu import MainMenu
-
-
 
 if __name__ == '__main__':
     pygame.init()
@@ -15,9 +13,9 @@ if __name__ == '__main__':
     main_menu = MainMenu(screen_width, screen_height)
 
     ALIENLASER = pygame.USEREVENT + 1
-    pygame.time.set_timer(ALIENLASER,800)
+    pygame.time.set_timer(ALIENLASER, 800)
     in_main_menu = True
-    
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -52,7 +50,3 @@ if __name__ == '__main__':
 
         pygame.display.flip()
         clock.tick(60)
-
-
-
- 
