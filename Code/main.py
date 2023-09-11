@@ -11,12 +11,12 @@ if __name__ == '__main__':
     screen = pygame.display.set_mode((screen_width, screen_height))
     clock = pygame.time.Clock()
     game = Game(screen, screen_width, screen_height)
-    #main_menu = MainMenu(screen_width, screen_height)
+    delay_duration = 1000
 
     #C
     score_manager = ScoreManager('scores.txt')
     score_manager.load_scores()
-    
+
     main_menu = MainMenu(screen_width, screen_height, score_manager)
     #CF
 
@@ -40,6 +40,7 @@ if __name__ == '__main__':
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_p:
                         game.paused = not game.paused
+
                 if not game.paused:
                     if event.type == ALIENLASER:
                         game.alien_shoot()
@@ -63,9 +64,15 @@ if __name__ == '__main__':
                     # Obtener los nuevos puntajes máximos después de agregar el nuevo puntaje.
                     top_scores = score_manager.get_top_scores()
                     print("Updated Top Scores:", top_scores)
+                    #limpiar nivel
+                    game.restart_level()
+                    # Establece el retraso de 1 segundo1 (1000 milisegundos)
+                    pygame.time.delay(delay_duration)
+                    in_main_menu = True
+
                 #CF
 
         pygame.display.flip()
         clock.tick(60)
-        
+
     game.score_manager.save_scores()

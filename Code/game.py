@@ -10,6 +10,7 @@ from menu import MainMenu
 
 class Game:
 
+
     def __init__(self, screen, screen_width, screen_height):
         self.screen = screen
         self.screen_width = screen_width
@@ -214,6 +215,24 @@ class Game:
                 pygame.quit()
                 sys.exit()
 
+    def clear_screen(self):
+        self.screen.fill((0, 0, 0))  # Llena la pantalla con color negro
+        self.blocks.empty()  # Limpia los obstáculos
+        self.aliens.empty()  # Limpia los aliens
+        self.player.sprite.lasers.empty()  # Limpia los láseres del jugador
+        self.alien_laser.empty()  # Limpia los láseres de los aliens
+        self.extra.empty()  # Limpia los elementos extras
+
+    #restart
+    def restart_level(self):
+        self.clear_screen()
+        # Restablecer las variables del nivel
+        self.game_over = False
+        self.player.sprite.score = 0
+        self.lives = 3  # O la cantidad deseada de vidas iniciales
+        self.create_new_wave()  # Crear una nueva oleada de aliens
+        self.regenerate_obstacles()
+
     def run(self):
         self.player.update()
         self.aliens.update(self.alien_direction)
@@ -233,9 +252,16 @@ class Game:
         # update all sprite groups
         # draw all sprite
 
+        if self.in_main_menu:
+            self.return_to_main_menu()
+            return
+
         # Revisar si todos los enemigos han sido eliminados
         if len(self.aliens) == 0:
             self.create_new_wave()
+            # aumentar una vida (no sobrepasar 6)
+            if (self.lives) <= 6:
+                self.lives += 1
 
         # vidas
         font = pygame.font.Font(None, 30)
@@ -246,6 +272,19 @@ class Game:
         font = pygame.font.Font(None, 30)  # Se puede borrar esta línea
         score_text = font.render(f'Score: {self.player.sprite.score}', True, (255, 255, 255))
         self.screen.blit(score_text, (110, 20))  # Ajusta la posición según la preferencia
+
+        # pausar con la tecla 'p' reiniciar con 'r'
+        for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:  # Pausar o reanudar el juego al presionar la tecla "P"
+                    self.paused = not self.paused  # Cambiar el estado de pausa
+                if event.key == pygame.K_r:
+                    # Reiniciar el nivel R"
+                    self.restart_level()
+                if event.key == pygame.K_ESCAPE:
+                    # Cerrar el juego"
+                    pygame.quit()
+                    sys.exit()
 
         # Game over
         if self.game_over:
@@ -259,5 +298,5 @@ class Game:
             self.score_manager.save_scores()
 
             return  # Detener la actualización si el juego ha terminado
-        
+
         # clock.tick(60)

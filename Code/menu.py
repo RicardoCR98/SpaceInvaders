@@ -10,7 +10,7 @@ class MainMenu:
         self.score_manager = score_manager
 
     def draw(self, screen):
-        title_text = self.font.render("Juego Espacial", True, (255, 255, 255))
+        title_text = self.font.render("Space invaders", True, (255, 255, 255))
         screen.blit(title_text, (self.screen_width // 2 - title_text.get_width() // 2, 100))
 
         option_spacing = 50  # Espacio vertical entre opciones
