@@ -109,15 +109,15 @@ class Game:
         for alien in all_aliens:
             if alien.rect.right >= self.screen_width:
                 self.alien_direction = -1 - self.alien_killed
-                self.alien_move_down(2)
+                self.aliens_move_down(2)
             elif alien.rect.left <= 0:
                 self.alien_direction = 1 + self.alien_killed
-                self.alien_move_down(2)
+                self.aliens_move_down(2)
 
-    def alien_move_down(self, distance):
+    def aliens_move_down(self, distance):
         if self.aliens:
             for alien in self.aliens.sprites():
-                alien.rect.y += distance
+                alien.down_a_row(distance)
 
     def alien_shoot(self):
         if self.aliens.sprites():
